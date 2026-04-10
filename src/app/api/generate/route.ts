@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-const pdfParse = require("pdf-parse") as (buffer: Buffer) => Promise<{ text: string }>;
 
 const MINIMAX_API_URL = "https://api.minimax.io/v1/text/chatcompletion_v2";
 
@@ -8,8 +7,7 @@ async function extractTextFromFile(file: File): Promise<string> {
   const lowerName = file.name.toLowerCase();
 
   if (lowerName.endsWith(".pdf")) {
-    const parsed = await pdfParse(buffer);
-    return parsed.text;
+    throw new Error("PDF parsing is currently unavailable in this environment.");
   }
 
   if (lowerName.endsWith(".txt") || lowerName.endsWith(".md")) {
@@ -40,10 +38,24 @@ export async function POST(req: NextRequest) {
     let resumeContent = cvText || "";
 
     if (cvFile && cvFile.size > 0) {
-      const extractedCvText = await extractTextFromFile(cvFile);
+      let extractedCvText = "";
+      try {
+        extractedCvText = await extractTextFromFile(cvFile);
+      } catch (error) {
+        return NextResponse.json(
+          {
+            error:
+              error instanceof Error
+                ? error.message
+                : "Failed to read CV file.",
+          },
+          { status: 400 }
+        );
+      }
+
       if (!extractedCvText.trim()) {
         return NextResponse.json(
-          { error: "Unsupported CV file type. Use PDF, TXT, or MD." },
+          { error: "Unsupported CV file type. Use TXT or MD." },
           { status: 400 }
         );
       }
@@ -59,11 +71,18 @@ export async function POST(req: NextRequest) {
 
     const parsedReferences = await Promise.all(
       referenceFiles.map(async (file) => {
-        const extractedText = await extractTextFromFile(file);
-        return {
-          name: file.name,
-          text: extractedText,
-        };
+        try {
+          const extractedText = await extractTextFromFile(file);
+          return {
+            name: file.name,
+            text: extractedText,
+          };
+        } catch {
+          return {
+            name: file.name,
+            text: "",
+          };
+        }
       })
     );
 

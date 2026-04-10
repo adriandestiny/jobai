@@ -18,6 +18,7 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 - [x] Added MiniMax API key input in UI and stored it in browser session storage
 - [x] Updated generate API route to accept session-provided MiniMax API key with env var fallback
 - [x] Improved client/server error handling to show actionable API/model errors instead of generic network error
+- [x] Fixed dev server crash from `pdf-parse` (`DOMMatrix is not defined`) by disabling PDF CV parsing in current environment and returning clear file-type errors
 
 ## Current Structure
 
@@ -50,3 +51,4 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 | 2026-04-10 | Added optional reference uploads and strict fact-only generation constraints |
 | 2026-04-10 | Added session-scoped MiniMax API key input and server support for key from request |
 | 2026-04-10 | Hardened generation error handling for non-JSON and invalid model responses |
+| 2026-04-10 | Resolved server 500 crash path from PDF parsing in API route; TXT/MD CV flow remains fully supported |

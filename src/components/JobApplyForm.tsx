@@ -40,8 +40,11 @@ export default function JobApplyForm() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file && (file.type === "application/pdf" || file.name.endsWith(".txt") || file.name.endsWith(".doc"))) {
-      setCvFile(file);
+    if (file) {
+      const lowerName = file.name.toLowerCase();
+      if (lowerName.endsWith(".txt") || lowerName.endsWith(".md")) {
+        setCvFile(file);
+      }
     }
   };
 
@@ -219,7 +222,7 @@ export default function JobApplyForm() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept=".pdf,.txt,.doc,.docx"
+                      accept=".txt,.md"
                       onChange={handleFileChange}
                       className="hidden"
                     />
@@ -243,7 +246,7 @@ export default function JobApplyForm() {
                         <p className="text-sm text-gray-400">
                           Drop your CV here or <span className="text-indigo-400">browse</span>
                         </p>
-                        <p className="text-xs text-gray-600">PDF, TXT, DOC supported</p>
+                        <p className="text-xs text-gray-600">TXT and MD supported</p>
                       </div>
                     )}
                   </div>
