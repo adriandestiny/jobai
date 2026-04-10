@@ -42,7 +42,11 @@ export default function JobApplyForm() {
     const file = e.dataTransfer.files?.[0];
     if (file) {
       const lowerName = file.name.toLowerCase();
-      if (lowerName.endsWith(".txt") || lowerName.endsWith(".md")) {
+      if (
+        lowerName.endsWith(".pdf") ||
+        lowerName.endsWith(".txt") ||
+        lowerName.endsWith(".md")
+      ) {
         setCvFile(file);
       }
     }
@@ -175,7 +179,7 @@ export default function JobApplyForm() {
                 <span className="text-indigo-400">tailored application</span>
               </h2>
               <p className="text-gray-400 max-w-xl mx-auto">
-                Upload your CV and optional references, then paste the job description to generate a fact-grounded CV and cover letter.
+                Upload your CV (PDF, TXT, or MD) and optional references, then paste the job description to generate a uniquely tailored CV and cover letter.
               </p>
             </div>
 
@@ -222,7 +226,7 @@ export default function JobApplyForm() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept=".txt,.md"
+                      accept=".pdf,.txt,.md"
                       onChange={handleFileChange}
                       className="hidden"
                     />
@@ -246,7 +250,7 @@ export default function JobApplyForm() {
                         <p className="text-sm text-gray-400">
                           Drop your CV here or <span className="text-indigo-400">browse</span>
                         </p>
-                        <p className="text-xs text-gray-600">TXT and MD supported</p>
+                        <p className="text-xs text-gray-600">PDF, TXT and MD supported</p>
                       </div>
                     )}
                   </div>
