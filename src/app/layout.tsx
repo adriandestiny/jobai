@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Template",
-  description: "A minimal Next.js starter template",
+  title: "JobFit AI – Tailored CVs & Cover Letters",
+  description: "Upload your CV, paste a job description, and get a tailored CV and cover letter instantly.",
 };
 
 export default function RootLayout({
