@@ -13,6 +13,8 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 - [x] Added server route at `src/app/api/generate/route.ts` to parse CV and generate outputs
 - [x] Switched LLM integration from OpenAI SDK to MiniMax token-based API (`MINIMAX_API_KEY`)
 - [x] Removed `openai` dependency from the project
+- [x] Added optional reference document upload support (PDF/TXT/MD)
+- [x] Updated generation prompts to enforce strict no-fabrication factuality
 
 ## Current Structure
 
@@ -42,3 +44,4 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 |------|---------|
 | Initial | Template created with base setup |
 | 2026-04-10 | Built JobFit AI MVP and switched generation provider from OpenAI to MiniMax |
+| 2026-04-10 | Added optional reference uploads and strict fact-only generation constraints |

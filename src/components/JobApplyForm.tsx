@@ -14,6 +14,7 @@ export default function JobApplyForm() {
   const [cvText, setCvText] = useState("");
   const [cvInputMode, setCvInputMode] = useState<"file" | "text">("file");
   const [jobDescription, setJobDescription] = useState("");
+  const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GeneratedResult | null>(null);
@@ -34,6 +35,15 @@ export default function JobApplyForm() {
     if (file && (file.type === "application/pdf" || file.name.endsWith(".txt") || file.name.endsWith(".doc"))) {
       setCvFile(file);
     }
+  };
+
+  const handleReferenceFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    const supportedFiles = files.filter((file) => {
+      const lowerName = file.name.toLowerCase();
+      return lowerName.endsWith(".pdf") || lowerName.endsWith(".txt") || lowerName.endsWith(".md");
+    });
+    setReferenceFiles(supportedFiles);
   };
 
   const handleGenerate = async () => {
@@ -62,6 +72,10 @@ export default function JobApplyForm() {
         formData.append("cv", cvFile);
       } else {
         formData.append("cvText", cvText);
+      }
+
+      for (const file of referenceFiles) {
+        formData.append("references", file);
       }
 
       const res = await fetch("/api/generate", {
@@ -131,7 +145,7 @@ export default function JobApplyForm() {
                 <span className="text-indigo-400">tailored application</span>
               </h2>
               <p className="text-gray-400 max-w-xl mx-auto">
-                Upload your CV, paste the job description, and get a customized CV and cover letter in seconds.
+                Upload your CV and optional references, then paste the job description to generate a fact-grounded CV and cover letter.
               </p>
             </div>
 
@@ -223,8 +237,27 @@ export default function JobApplyForm() {
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   placeholder="Paste the full job description here — role requirements, responsibilities, company info..."
-                  className="w-full h-64 bg-gray-800 border border-gray-700 rounded-xl p-4 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full h-40 bg-gray-800 border border-gray-700 rounded-xl p-4 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-colors"
                 />
+
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-white">Optional reference documents</h4>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.md"
+                    multiple
+                    onChange={handleReferenceFilesChange}
+                    className="block w-full text-xs text-gray-300 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-800 file:px-3 file:py-2 file:text-xs file:font-medium file:text-gray-200 hover:file:bg-gray-700"
+                  />
+                  <p className="text-xs text-gray-500">Upload certificates, recommendations, portfolios, or project notes (PDF, TXT, MD).</p>
+                  {referenceFiles.length > 0 && (
+                    <ul className="space-y-1 text-xs text-gray-400">
+                      {referenceFiles.map((file) => (
+                        <li key={`${file.name}-${file.size}`}>• {file.name}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
 
