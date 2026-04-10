@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
 const pdfParse = require("pdf-parse") as (buffer: Buffer) => Promise<{ text: string }>;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const MINIMAX_API_URL = "https://api.minimax.io/v1/text/chatcompletion_v2";
 
 export async function POST(req: NextRequest) {
   try {
@@ -75,17 +72,45 @@ Format your response as JSON with two fields:
 - "tailoredCV": the complete tailored CV as a string (use \\n for line breaks)
 - "coverLetter": the complete cover letter as a string (use \\n for line breaks)`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
+    const minimaxApiKey = process.env.MINIMAX_API_KEY;
+
+    if (!minimaxApiKey) {
+      return NextResponse.json(
+        { error: "Server is missing MINIMAX_API_KEY" },
+        { status: 500 }
+      );
+    }
+
+    const completion = await fetch(MINIMAX_API_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${minimaxApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "MiniMax-Text-01",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.7,
+      }),
     });
 
-    const content = completion.choices[0].message.content;
+    if (!completion.ok) {
+      const errorText = await completion.text();
+      console.error("MiniMax API error:", errorText);
+      return NextResponse.json(
+        { error: "MiniMax request failed. Check token and balance." },
+        { status: 502 }
+      );
+    }
+
+    const completionData = (await completion.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+
+    const content = completionData.choices?.[0]?.message?.content;
     if (!content) {
       return NextResponse.json(
         { error: "Failed to generate content" },
