@@ -15,6 +15,8 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 - [x] Removed `openai` dependency from the project
 - [x] Added optional reference document upload support (PDF/TXT/MD)
 - [x] Updated generation prompts to enforce strict no-fabrication factuality
+- [x] Added MiniMax API key input in UI and stored it in browser session storage
+- [x] Updated generate API route to accept session-provided MiniMax API key with env var fallback
 
 ## Current Structure
 
@@ -34,7 +36,7 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 
 ## Environment Notes
 
-- Required server env var: `MINIMAX_API_KEY`
+- MiniMax API key can be provided per-session via UI (sessionStorage) or via server env var `MINIMAX_API_KEY`
 - API endpoint used: `https://api.minimax.io/v1/text/chatcompletion_v2`
 - Current MiniMax model in use: `MiniMax-Text-01`
 
@@ -45,3 +47,4 @@ The project is now a Next.js 16 app that lets users upload/paste CV content, pas
 | Initial | Template created with base setup |
 | 2026-04-10 | Built JobFit AI MVP and switched generation provider from OpenAI to MiniMax |
 | 2026-04-10 | Added optional reference uploads and strict fact-only generation constraints |
+| 2026-04-10 | Added session-scoped MiniMax API key input and server support for key from request |

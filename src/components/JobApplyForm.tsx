@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface GeneratedResult {
   tailoredCV: string;
@@ -15,12 +15,20 @@ export default function JobApplyForm() {
   const [cvInputMode, setCvInputMode] = useState<"file" | "text">("file");
   const [jobDescription, setJobDescription] = useState("");
   const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
+  const [minimaxApiKey, setMinimaxApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<GeneratedResult | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("cv");
   const [copied, setCopied] = useState<"cv" | "cover" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const storedKey = sessionStorage.getItem("minimaxApiKey");
+    if (storedKey) {
+      setMinimaxApiKey(storedKey);
+    }
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,12 +70,19 @@ export default function JobApplyForm() {
       setError("Please paste your CV content.");
       return;
     }
+    if (!minimaxApiKey.trim()) {
+      setError("Please enter your MiniMax API key.");
+      return;
+    }
 
     setLoading(true);
 
     try {
       const formData = new FormData();
       formData.append("jobDescription", jobDescription);
+      if (minimaxApiKey.trim()) {
+        formData.append("minimaxApiKey", minimaxApiKey.trim());
+      }
       if (cvInputMode === "file" && cvFile) {
         formData.append("cv", cvFile);
       } else {
@@ -239,6 +254,23 @@ export default function JobApplyForm() {
                   placeholder="Paste the full job description here — role requirements, responsibilities, company info..."
                   className="w-full h-40 bg-gray-800 border border-gray-700 rounded-xl p-4 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-colors"
                 />
+
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-white">MiniMax API Key</h4>
+                  <input
+                    type="password"
+                    value={minimaxApiKey}
+                    onChange={(e) => {
+                      const nextKey = e.target.value;
+                      setMinimaxApiKey(nextKey);
+                      sessionStorage.setItem("minimaxApiKey", nextKey);
+                    }}
+                    placeholder="Enter your MiniMax API key"
+                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                    autoComplete="off"
+                  />
+                  <p className="text-xs text-gray-500">Stored in your browser session only and cleared when the session ends.</p>
+                </div>
 
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-white">Optional reference documents</h4>

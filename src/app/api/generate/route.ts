@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     const jobDescription = formData.get("jobDescription") as string;
     const cvFile = formData.get("cv") as File | null;
     const cvText = formData.get("cvText") as string | null;
+    const minimaxApiKeyFromSession = formData.get("minimaxApiKey") as string | null;
     const referenceFiles = formData
       .getAll("references")
       .filter((entry): entry is File => entry instanceof File && entry.size > 0);
@@ -123,12 +124,12 @@ Format your response as JSON with two fields:
 - "tailoredCV": the complete tailored CV as a string (use \\n for line breaks)
 - "coverLetter": the complete cover letter as a string (use \\n for line breaks)`;
 
-    const minimaxApiKey = process.env.MINIMAX_API_KEY;
+    const minimaxApiKey = (minimaxApiKeyFromSession?.trim() || process.env.MINIMAX_API_KEY || "").trim();
 
     if (!minimaxApiKey) {
       return NextResponse.json(
-        { error: "Server is missing MINIMAX_API_KEY" },
-        { status: 500 }
+        { error: "MiniMax API key is required" },
+        { status: 400 }
       );
     }
 
