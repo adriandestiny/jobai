@@ -98,14 +98,26 @@ export default function JobApplyForm() {
         body: formData,
       });
 
-      const data = await res.json();
+      const raw = await res.text();
+      let data: Partial<GeneratedResult> & { error?: string } = {};
+
+      if (raw) {
+        try {
+          data = JSON.parse(raw) as Partial<GeneratedResult> & { error?: string };
+        } catch {
+          data = { error: raw };
+        }
+      }
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong.");
+        setError(data.error || `Request failed with status ${res.status}.`);
         return;
       }
 
-      setResult(data);
+      setResult({
+        tailoredCV: data.tailoredCV || "",
+        coverLetter: data.coverLetter || "",
+      });
       setActiveTab("cv");
     } catch {
       setError("Network error. Please try again.");

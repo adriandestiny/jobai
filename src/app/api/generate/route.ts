@@ -170,7 +170,20 @@ Format your response as JSON with two fields:
       );
     }
 
-    const result = JSON.parse(content);
+    const normalized = content.trim();
+    const jsonCandidate = normalized.startsWith("```")
+      ? normalized.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "")
+      : normalized;
+
+    let result: { tailoredCV?: string; coverLetter?: string };
+    try {
+      result = JSON.parse(jsonCandidate) as { tailoredCV?: string; coverLetter?: string };
+    } catch {
+      return NextResponse.json(
+        { error: "Model returned invalid JSON. Please try again." },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({
       tailoredCV: result.tailoredCV || "",
