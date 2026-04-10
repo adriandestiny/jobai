@@ -1,8 +1,8 @@
-# Active Context: Next.js Starter Template
+# Active Context: JobFit AI
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**App Status**: ✅ Fully functional job application assistant
 
 The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
 
